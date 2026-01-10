@@ -1,8 +1,9 @@
 name: SEB Monitor Test
 
-# Nur manuell auslösen
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '*/1 * * * *'  # jede Minute
+
 
 jobs:
   run_test_scraper:
