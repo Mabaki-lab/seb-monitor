@@ -49,8 +49,9 @@ async def scrape_news():
 
         # Telegram-Nachricht erstellen
         msg = f"Es gibt aktuell {count} News auf der SEB ImmoInvest Seite."
-        if count > 2:
+        if count > 3:
             msg += f"\n\n{latest_msg}"
+            send_telegram(msg)
 
         send_telegram(msg)
         print("Telegram gesendet:", msg)
