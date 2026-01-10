@@ -1,4 +1,5 @@
 import requests
+from bs4 import BeautifulSoup
 from datetime import datetime
 import os
 
@@ -6,20 +7,26 @@ import os
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-# --- URL für Test-Scraping (Berliner Zeit) ---
-URL = "https://worldtimeapi.org/api/timezone/Europe/Berlin"
+# --- SEB-ImmoInvest Preise URL ---
+URL = "https://www.savillsim-publikumsfonds.de/de/fonds/seb-immoinvest/preise"
 
-# --- Logdatei für Test ---
-LOG_FILE = "logs_test.txt"
+LOG_FILE = "logs.txt"
 
-def get_current_time():
-    """Lädt die aktuelle Zeit von Berlin"""
+def get_current_price():
+    """Extrahiert den Rücknahmepreis aus div.footenote"""
     try:
         headers = {"User-Agent": "Mozilla/5.0 (GitHub Actions Test)"}
         r = requests.get(URL, timeout=60, headers=headers)
         r.raise_for_status()
-        data = r.json()
-        return data.get("datetime")
+        soup = BeautifulSoup(r.text, "html.parser")
+        div = soup.select_one("div.footenote")
+        if div:
+            text = div.get_text(separator="\n")
+            for line in text.split("\n"):
+                if "Rücknahmepreis" in line:
+                    # z. B. "Rücknahmepreis   Eur 0,61"
+                    price = line.split("Eur")[-1].strip()
+                    return price
     except Exception as e:
         print("Scraper Fehler:", e)
     return None
@@ -38,17 +45,17 @@ def send_telegram(message):
         print("Telegram Fehler:", e)
 
 def main():
-    current_time = get_current_time()
-    if current_time:
+    price = get_current_price()
+    if price:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        message = f"⏰ Aktuelle Berliner Zeit ({timestamp}): {current_time}"
+        message = f"💰 SEB-ImmoInvest Rücknahmepreis ({timestamp}): {price} EUR"
         send_telegram(message)
         # Logs speichern
         with open(LOG_FILE, "a", encoding="utf-8") as f:
-            f.write(f"[{timestamp}] {current_time}\n\n")
-        print("Telegram gesendet und Log geschrieben.")
+            f.write(f"[{timestamp}] {price} EUR\n\n")
+        print(f"Telegram gesendet: {price} EUR")
     else:
-        print("Kein Inhalt gefunden.")
+        print("Kein Preis gefunden.")
 
 if __name__ == "__main__":
     main()
