@@ -3,15 +3,18 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import os
 
-# --- Telegram Daten aus GitHub Secrets ---
-BOT_TOKEN = os.environ['TELEGRAM_BOT_TOKEN']
-CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
+# --- Telegram Secrets aus GitHub Actions ---
+BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
+CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-# Test-URL (kann SEB-ImmoInvest sein oder eine Testseite)
+# --- URL für Test-Scraping (SEB-ImmoInvest) ---
 URL = "https://www.savillsim-publikumsfonds.de/de/fonds/seb-immoinvest/preise"
+
+# --- Temporäre Test-Logdatei ---
 LOG_FILE = "logs_test.txt"
 
 def get_div_content():
+    """Scrape den div.footenote Inhalt"""
     try:
         r = requests.get(URL, timeout=30)
         r.raise_for_status()
@@ -24,9 +27,15 @@ def get_div_content():
     return None
 
 def send_telegram(message):
+    """Sende Nachricht über Telegram Bot"""
+    if not BOT_TOKEN or not CHAT_ID:
+        print("Telegram Secrets fehlen!")
+        return
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     try:
-        requests.post(url, data={"chat_id": CHAT_ID, "text": message}, timeout=10)
+        r = requests.post(url, data={"chat_id": CHAT_ID, "text": message}, timeout=10)
+        if not r.ok:
+            print("Telegram Fehler:", r.text)
     except Exception as e:
         print("Telegram Fehler:", e)
 
@@ -39,7 +48,9 @@ def main():
         # Logs speichern
         with open(LOG_FILE, "a", encoding="utf-8") as f:
             f.write(f"[{timestamp}] {content}\n\n")
-        print("Telegram gesendet und Test-Log erstellt.")
+        print("Telegram gesendet und Log geschrieben.")
+    else:
+        print("Kein Inhalt gefunden.")
 
 if __name__ == "__main__":
     main()
