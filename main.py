@@ -6,15 +6,17 @@ import os
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-# --- URL für Test ---
+# --- URL für Test-Scraping (Berliner Zeit) ---
 URL = "https://worldtimeapi.org/api/timezone/Europe/Berlin"
 
+# --- Logdatei für Test ---
 LOG_FILE = "logs_test.txt"
 
 def get_current_time():
     """Lädt die aktuelle Zeit von Berlin"""
     try:
-        r = requests.get(URL, timeout=30)
+        headers = {"User-Agent": "Mozilla/5.0 (GitHub Actions Test)"}
+        r = requests.get(URL, timeout=60, headers=headers)
         r.raise_for_status()
         data = r.json()
         return data.get("datetime")
