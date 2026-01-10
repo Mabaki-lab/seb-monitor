@@ -1,5 +1,4 @@
 import requests
-from bs4 import BeautifulSoup
 from datetime import datetime
 import os
 
@@ -7,27 +6,24 @@ import os
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.environ.get("TELEGRAM_CHAT_ID")
 
-# --- URL für Test-Scraping (SEB-ImmoInvest) ---
-URL = "https://www.savillsim-publikumsfonds.de/de/fonds/seb-immoinvest/preise"
+# --- URL für Test ---
+URL = "https://worldtimeapi.org/api/timezone/Europe/Berlin"
 
-# --- Temporäre Test-Logdatei ---
 LOG_FILE = "logs_test.txt"
 
-def get_div_content():
-    """Scrape den div.footenote Inhalt"""
+def get_current_time():
+    """Lädt die aktuelle Zeit von Berlin"""
     try:
         r = requests.get(URL, timeout=30)
         r.raise_for_status()
-        soup = BeautifulSoup(r.text, "html.parser")
-        div = soup.select_one("div.footenote")
-        if div:
-            return div.get_text(separator="\n").strip()
+        data = r.json()
+        return data.get("datetime")
     except Exception as e:
         print("Scraper Fehler:", e)
     return None
 
 def send_telegram(message):
-    """Sende Nachricht über Telegram Bot"""
+    """Telegram Nachricht senden"""
     if not BOT_TOKEN or not CHAT_ID:
         print("Telegram Secrets fehlen!")
         return
@@ -40,14 +36,14 @@ def send_telegram(message):
         print("Telegram Fehler:", e)
 
 def main():
-    content = get_div_content()
-    if content:
+    current_time = get_current_time()
+    if current_time:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        message = f"🔔 Test SEB-ImmoInvest ({timestamp}):\n{content}"
+        message = f"⏰ Aktuelle Berliner Zeit ({timestamp}): {current_time}"
         send_telegram(message)
         # Logs speichern
         with open(LOG_FILE, "a", encoding="utf-8") as f:
-            f.write(f"[{timestamp}] {content}\n\n")
+            f.write(f"[{timestamp}] {current_time}\n\n")
         print("Telegram gesendet und Log geschrieben.")
     else:
         print("Kein Inhalt gefunden.")
