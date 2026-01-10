@@ -29,7 +29,7 @@ jobs:
           python main.py
 
       - name: Logs als Artifact hochladen
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4  # <-- aktualisierte Version
         with:
           name: logs_test
           path: logs_test.txt
