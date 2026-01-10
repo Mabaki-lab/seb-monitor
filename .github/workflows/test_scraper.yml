@@ -1,10 +1,11 @@
 name: SEB Monitor Test
 
+# Nur manuell auslösen
 on:
-  workflow_dispatch:  # manuelles Auslösen
+  workflow_dispatch:
 
 jobs:
-  run_scraper_test:
+  run_test_scraper:
     runs-on: ubuntu-latest
     steps:
       - name: Repository auschecken
@@ -26,3 +27,9 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
           python main.py
+
+      - name: Logs als Artifact hochladen
+        uses: actions/upload-artifact@v3
+        with:
+          name: logs_test
+          path: logs_test.txt
