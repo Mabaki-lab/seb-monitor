@@ -3,6 +3,7 @@ name: SEB Monitor Test
 on:
   schedule:
     - cron: '*/1 * * * *'  # jede Minute
+     workflow_dispatch: 
 
 
 jobs:
