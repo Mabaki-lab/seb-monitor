@@ -3,6 +3,7 @@ import asyncio
 from playwright.async_api import async_playwright
 import json
 import requests
+import time  # für die Schleife
 
 # --- Telegram Secrets ---
 BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
@@ -101,5 +102,10 @@ async def scrape_news():
 def main():
     asyncio.run(scrape_news())
 
+# --- Endlosschleife für schnelle Tests ---
 if __name__ == "__main__":
-    main()
+    INTERVAL = 60  # Sekunden zwischen den Checks, z.B. 60 = 1 Minute
+    print(f"Starte SEB-ImmoInvest News Monitor, Intervall: {INTERVAL}s")
+    while True:
+        main()
+        time.sleep(INTERVAL)
