@@ -1,16 +1,15 @@
-name: SEB Monitor Cron
+name: SEB Monitor Test
 
-# Läuft jede Minute
+# Nur manuell auslösen
 on:
-  schedule:
-    - cron: '*/1 * * * *'  # jede Minute
-  workflow_dispatch:        # zusätzlich manuell auslösen
+  workflow_dispatch:
 
 jobs:
-  run_scraper:
+  run_test_scraper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Repository auschecken
+        uses: actions/checkout@v3
 
       - name: Python Setup
         uses: actions/setup-python@v4
@@ -23,13 +22,13 @@ jobs:
           pip install requests playwright
           playwright install
 
-      - name: Scraper ausführen
+      - name: Test-Scraper ausführen
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python main.py
 
-      - name: Log als Artifact hochladen
+      - name: Logs als Artifact hochladen
         uses: actions/upload-artifact@v4
         with:
           name: news_log
