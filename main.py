@@ -53,7 +53,7 @@ async def scrape_news():
             msg += f"\n\n{latest_msg}"
             send_telegram(msg)
 
-        send_telegram(msg)
+       
         print("Telegram gesendet:", msg)
 
         await browser.close()
