@@ -13,7 +13,7 @@ NEWS_URL = "https://www.savillsim-publikumsfonds.de/de/fonds/seb-immoinvest/news
 # --- Telegram Nachricht senden ---
 def send_telegram(message: str):
     if not BOT_TOKEN or not CHAT_ID:
-        print("Telegram Secrets fehlen!")
+        print("Telegramm Secrets fehlen!")
         return
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
