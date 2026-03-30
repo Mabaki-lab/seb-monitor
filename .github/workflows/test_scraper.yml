@@ -3,7 +3,7 @@ name: SEB Monitor Test
 # Nur manuell auslösen
 on:
   schedule:
-    - cron: '*/15 * * * *'  # jede Minute
+    - cron: '*/15 * * * *'  # jede 15 Minuten
 
   workflow_dispatch:
 
